@@ -14,7 +14,7 @@ promos = {
 cache = {}
 
 
-def get_plan(total_items: int, items: Tuple[Tuple[int, int]]):
+def get_plan(total_items: int, items: Tuple[Tuple[int, int], ...]):
 
     # check if any quantity is negative
     completed_items = 0
