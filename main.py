@@ -16,7 +16,7 @@ offers = {
 cache = {}
 
 
-def get_plan(total_items: int, items: Tuple[Tuple[int, int], ...]):
+def get_plan(total_items: int, items: List[Tuple[int, int]]):
 
     # check if any quantity is negative
     completed_items = 0
@@ -31,34 +31,35 @@ def get_plan(total_items: int, items: Tuple[Tuple[int, int], ...]):
         return 0
 
     # check if result is in cache i.e. already computed
-    if items in cache:
-        return cache[items]
+    if tuple(items) in cache:
+        return cache[tuple(items)]
 
     # calculate value of items
-    items_list = [list(item) for item in items]
-    total_cost = 0
+    items = [list(item) for item in items]
+    bill = 0
 
+    # iterate over every purchase we can make (promos or individual items)
     for offer, cost in offers.items():
+        # if it is just the price of a single item i.e. a single tuple with 2 integers e.g. (7,1)
         if isinstance(offer[0], int):
-            for pair in items_list:
-                if pair[0] == offer[0] and pair[1] > 0:
-                    pair[1] -= offer[1]
-                    items = tuple([tuple(items) for items in items_list])
-                    total_cost += cost + get_plan(total_items, items)
-        else:
-            for item in offer:
-                for pair in items_list:
-                    if pair[0] == item[0] and pair[1] > 0:
-                        pair[1] -= item[1]
-                        items = tuple([tuple(items) for items in items_list])
-                        total_cost += cost + get_plan(total_items, items)
+            for i, item in enumerate(items):
+                if item[0] == offer[0] and item[1] > 0:
+                    items[i] = [item[0], item[1] - offer[1]]
+                    bill += cost
 
-    cache[items] = total_cost
+        # if it is a promotion including multiple items i.e. a tuple of tuples e.g. ((7,3), (8,2), ...)
+        else:
+            for pair in offer:
+                for i, item in enumerate(items):
+                    if item[0] == pair[0] and item[1] > 0:
+                        items[i] = [item[0], item[1] - pair[1]]
+                        bill += cost
+
+    cache[tuple(items)] = bill
     return cache[items]
 
 
 # print(get_plan(2, ((7, 0), (8, 0))))
 # print(get_plan(2, ((7, 3), (8, -1))))
 # print(get_plan(2, ((7, 3), (8, 1))))
-# print(get_plan(2, ((7, 3), (8, 2))))
-print(get_plan(2, ((7, 1), (8, 1))))
+print(get_plan(2, ((7, 3), (8, 2))))
