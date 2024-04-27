@@ -1,0 +1,3 @@
+Optimal Purchase Plan:
+Item ID: 1, Amount: 4
+Total Payment: 37.0
